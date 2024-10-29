@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Change Challenge</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f0f2f5;
+        }
+        .game-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #e3e8ff;
+            border-radius: 5px;
+        }
+        .question {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        .button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            background: #4a90e2;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .button:hover {
+            background: #357abd;
+        }
+        .feedback {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .correct {
+            background: #d4edda;
+            color: #155724;
+        }
+        .incorrect {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container" id="gameContainer">
+        <div class="header">
+            <div>Score: <span id="score">0</span></div>
+            <div>Time: <span id="timer">30</span>s</div>
+        </div>
+        <div id="gameContent">
+            <h1>Change Challenge</h1>
+            <button class="button" onclick="startGame()">Start Challenge</button>
+        </div>
+    </div>
+
+    <script>
+        const challenges = [
+            {
+                question: "Your favorite app suddenly got a complete redesign overnight. What type of change is this?",
+                options: ["Gradual Change", "Sudden Change", "No Change"],
+                correct: 1
+            },
+            {
+                question: "Your music taste has evolved over the past year. This is an example of:",
+                options: ["Gradual Change", "Sudden Change", "Cyclic Change"],
+                correct: 0
+            },
+            {
+                question: "How do you best adapt to unexpected changes in technology?",
+                options: [
+                    "Ignore the changes completely",
+                    "Take time to learn and explore new features",
+                    "Immediately switch to a different platform"
+                ],
+                correct: 1
+            },
+            {
+                question: "When your daily routine changes between school and summer break, this represents:",
+                options: ["Sudden Change", "Gradual Change", "Cyclic Change"],
+                correct: 2
+            },
+            {
+                question: "What's the best approach when facing a major change in your social group?",
+                options: [
+                    "Avoid the situation completely",
+                    "Have an open discussion about the changes",
+                    "Pretend nothing is different"
+                ],
+                correct: 1
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let timer = 30;
+        let gameInterval;
+
+        function startGame() {
+            score = 0;
+            currentQuestion = 0;
+            timer = 30;
+            document.getElementById('score').textContent = score;
+            showQuestion();
+            startTimer();
+        }
+
+        function showQuestion() {
+            if (currentQuestion >= challenges.length) {
+                endGame();
+                return;
+            }
+
+            const challenge = challenges[currentQuestion];
+            let questionHTML = `
+                <h2>Question ${currentQuestion + 1}/${challenges.length}</h2>
+                <div class="question">${challenge.question}</div>
+            `;
+
+            challenge.options.forEach((option, index) => {
+                questionHTML += `
+                    <button class="button" onclick="checkAnswer(${index})">
+                        ${option}
+                    </button>
+                `;
+            });
+
+            document.getElementById('gameContent').innerHTML = questionHTML;
+        }
+
+        function checkAnswer(answerIndex) {
+            const challenge = challenges[currentQuestion];
+            const feedbackDiv = document.createElement('div');
+            feedbackDiv.className = 'feedback';
+
+            if (answerIndex === challenge.correct) {
+                score += 10;
+                document.getElementById('score').textContent = score;
+                feedbackDiv.textContent = 'Correct! +10 points';
+                feedbackDiv.classList.add('correct');
+            } else {
+                feedbackDiv.textContent = 'Incorrect! Try the next question';
+                feedbackDiv.classList.add('incorrect');
+            }
+
+            document.getElementById('gameContent').appendChild(feedbackDiv);
+
+            setTimeout(() => {
+                currentQuestion++;
+                showQuestion();
+            }, 1000);
+        }
+
+        function startTimer() {
+            gameInterval = setInterval(() => {
+                timer--;
+                document.getElementById('timer').textContent = timer;
+                if (timer <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function endGame() {
+            clearInterval(gameInterval);
+            const stars = '⭐'.repeat(Math.floor(score / 20));
+            document.getElementById('gameContent').innerHTML = `
+                <h2>Game Over!</h2>
+                <div class="question">
+                    <p>Final Score: ${score}</p>
+                    <p>Stars Earned: ${stars}</p>
+                </div>
+                <button class="button" onclick="startGame()">Play Again</button>
+            `;
+        }
+    </script>
+</body>
+</html>
